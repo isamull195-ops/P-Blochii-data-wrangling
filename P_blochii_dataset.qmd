@@ -1,0 +1,93 @@
+---
+title: "P.blochii dataset"
+author: "Isabella Muller"
+format: pdf
+---
+
+```{r}
+#|label: load-packages
+#|include: false
+
+library(tidyverse)
+library(readxl)
+```
+
+```{r}
+#| label:Reading-dataset
+#| include: false
+
+P_blochii_dataset <- read_excel("P_blochii dataset.xlsx")
+write_csv(data, "P_blochii_subset.csv")
+View(P_blochii_dataset)
+```
+
+```{r}
+#| label:Summary-of-dataset
+#| include: false
+ P_blochii_dataset
+```
+
+## Tidying the data set (Case 1- Sex and Mass)
+
+First by summarizing the mean mass of each sex of this fish species P. blochii. To do this I need to group each sex and summarize the mean mass of each sex.
+
+```{r}
+#| label: Summarizing mean mass of each sex 
+#| include: false
+ mass_summary <- P_blochii_dataset %>% 
+   group_by(Sex) %>% 
+   summarise(mean_mass = mean(Mass, na.rm = TRUE))
+ print(mass_summary)
+```
+
+##Plotting this summary as a box plot
+
+```{r}
+#| label: Boxplot of sex and mean mass 
+#| echo: false
+
+ggplot(P_blochii_dataset, aes(x = Sex, y = Mass)) +
+  geom_boxplot() +
+  theme_minimal()
+```
+
+## Tidying the dataset (Case 2 - Season and Mass)
+
+Secondly i am going to summarize mass by season, to investigate breeding seasons (where they will eat less and therefore have less mass in breeding seasons). To do this i noticed the seasons are categorized in numbers, so will replace this with the actual seasons.
+
+```{r}
+#| label: changing season numbers to name labels 
+#| include: false
+P_blochii_dataset2 <- P_blochii_dataset %>% 
+mutate(Season = factor(Season,
+                       levels = c(1, 2, 3, 4), 
+                       labels = c("Summer", "Autumn", "Winter", "Spring"))) 
+
+P_blochii_dataset2
+```
+
+#Summarising mean mass by season
+
+Now I can summarise the mean mass by each season.
+
+```{r}
+#| label: Summary of mass by season
+#| include: false
+season_summary <- P_blochii_dataset2 %>% 
+  group_by(Season) %>% 
+  summarise(mean_mass = mean(Mass, na.rm = TRUE),
+            sd_mass = sd(Mass, na.rm = TRUE),
+            n = n()) 
+
+season_summary
+```
+
+#Plotting mean mass by season
+
+```{r}
+#| label: Plot of mean mass by season 
+#| echo: false
+ggplot(P_blochii_dataset2, aes(x = Season, y = Mass)) + 
+geom_boxplot() + 
+theme_minimal()
+```
